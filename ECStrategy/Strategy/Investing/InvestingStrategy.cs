@@ -1,8 +1,9 @@
-﻿using HtmlAgilityPack;
+﻿using ECStrategy.Models.Base;
+using HtmlAgilityPack;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
-namespace ECStrategy.Investing
+namespace ECStrategy.Strategy.Investing
 {
     public class InvestingStrategy : BaseStrategy<Request, Response>
     {
@@ -13,25 +14,42 @@ namespace ECStrategy.Investing
 
         public override async Task HttpRequestMessageAsync()
         {
-            _httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, $"{_crawlerFieldConfig.Route}");
-
             await Task.CompletedTask;
         }
 
         public override async Task<IDictionary<string, string>> SendRequest()
         {
+            var pageUrl = $"{_httpClient.BaseAddress}{_crawlerFieldConfig.Route}";
+
+            var options = new ChromeOptions();
+            //options.AddArgument("--headless");
+            //options.AddArgument("--disable-gpu");
+            //options.AddArgument("--window-size=1920,1200");
+            options.AddArgument("--ignore-certificate-errors");
+            options.AddArgument("--ignore-ssl-errors");
+            options.AcceptInsecureCertificates = true;
+
+            if (_crawlerFieldConfig.Extra.TryGetValue("DriverLocation", out var driverLocation))
+            {
+                options.BinaryLocation = driverLocation;
+                options.AddArgument("--enable-brave-extension");
+            }
+
+            if (_crawlerFieldConfig.Extra.TryGetValue("ExtensionPath", out var extensionPath))
+            {
+                options.AddExtension(extensionPath);
+            }
+
+            var driver = new ChromeDriver(options);
+
             try
             {
-                var options = new ChromeOptions();
-                //options.AddArgument("--ignore-certificate-errors");
-                //options.AddArgument("--ignore-ssl-errors");
-                options.BinaryLocation = "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe";
-
-                var driver = new ChromeDriver(options);
                 var js = (IJavaScriptExecutor)driver;
-                driver.Navigate().GoToUrl("https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield-historical-data");
+                driver.Navigate().GoToUrl(pageUrl);
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
+
                 driver.Manage().Window.Maximize();
-                js.ExecuteScript("window.scrollTo(0,800)");
+                js.ExecuteScript("window.scrollTo(0,400)");
                 driver.FindElement(By.XPath("//div[@id='history-timeframe-selector']/div/div")).Click();
                 driver.FindElement(By.XPath("//div[@id=\'history-timeframe-selector\']/div[2]/div/div[3]")).Click();
                 driver.FindElement(By.XPath("//div[2]/div[2]/div[2]/div/div")).Click();
@@ -68,11 +86,14 @@ namespace ECStrategy.Investing
                 }
 
                 return result
-                        .Where(r => r.Date >= this._dateRange.StartDate && r.Date <= this._dateRange.EndDate)
+                        .Where(r => r.Date >= _dateRange.StartDate && r.Date <= _dateRange.EndDate)
                         .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value);
             }
             catch (Exception ex)
             {
+                driver.Quit();
+                driver.Dispose();
+
                 return new Dictionary<string, string>();
             }
         }

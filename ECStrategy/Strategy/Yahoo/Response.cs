@@ -1,4 +1,4 @@
-﻿namespace ECStrategy.Yahoo
+﻿namespace ECStrategy.Strategy.Yahoo
 {
     public class Response
     {

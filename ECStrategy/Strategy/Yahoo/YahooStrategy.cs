@@ -1,8 +1,9 @@
-﻿using ECStrategy.Utilities;
+﻿using ECStrategy.Models.Base;
+using ECStrategy.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ECStrategy.Yahoo
+namespace ECStrategy.Strategy.Yahoo
 {
     public class YahooStrategy : BaseStrategy<Request, Response>
     {
@@ -13,8 +14,8 @@ namespace ECStrategy.Yahoo
 
         public override async Task HttpRequestMessageAsync()
         {
-            var startTimestamps = (long)this._dateRange.StartDate.Subtract(DateTime.UnixEpoch).TotalSeconds;
-            var endTimestamps = (long)this._dateRange.EndDate.Subtract(DateTime.UnixEpoch).TotalSeconds;
+            var startTimestamps = (long)_dateRange.StartDate.Subtract(DateTime.UnixEpoch).TotalSeconds;
+            var endTimestamps = (long)_dateRange.EndDate.Subtract(DateTime.UnixEpoch).TotalSeconds;
 
             _request = new Request
             {
@@ -35,7 +36,7 @@ namespace ECStrategy.Yahoo
                 {
                     response.EnsureSuccessStatusCode();
 
-                    var startDate = this._dateRange.StartDate;
+                    var startDate = _dateRange.StartDate;
                     var stream = await response.Content.ReadAsStringAsync();
                     var jsonDocument = JsonConvert.DeserializeObject<JObject>(stream);
 

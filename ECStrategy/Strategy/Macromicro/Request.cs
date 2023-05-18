@@ -1,4 +1,6 @@
-﻿namespace ECStrategy.Macromicro
+﻿using ECStrategy.Models.Base;
+
+namespace ECStrategy.Strategy.Macromicro
 {
     public class Request : BaseRequest
     {

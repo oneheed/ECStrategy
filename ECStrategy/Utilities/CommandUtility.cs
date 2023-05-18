@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using ECStrategy.Models.Base;
 using Newtonsoft.Json;
 
 namespace ECStrategy.Utilities

@@ -1,4 +1,4 @@
-﻿namespace ECStrategy
+﻿namespace ECStrategy.Models
 {
     public class DateRange
     {

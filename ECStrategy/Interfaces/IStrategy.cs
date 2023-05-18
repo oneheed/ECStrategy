@@ -1,4 +1,6 @@
-﻿namespace ECStrategy.Interfaces
+﻿using ECStrategy.Models;
+
+namespace ECStrategy.Interfaces
 {
     internal interface IStrategy
     {

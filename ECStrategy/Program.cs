@@ -1,13 +1,14 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ECStrategy;
-using ECStrategy.Fred;
 using ECStrategy.Interfaces;
-using ECStrategy.Investing;
-using ECStrategy.Macromicro;
-using ECStrategy.SalaryGrowth;
-using ECStrategy.Sbcharts;
+using ECStrategy.Models;
+using ECStrategy.Strategy.Fred;
+using ECStrategy.Strategy.Investing;
+using ECStrategy.Strategy.Macromicro;
+using ECStrategy.Strategy.SalaryGrowth;
+using ECStrategy.Strategy.Sbcharts;
+using ECStrategy.Strategy.Yahoo;
 using ECStrategy.Utilities;
-using ECStrategy.Yahoo;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;

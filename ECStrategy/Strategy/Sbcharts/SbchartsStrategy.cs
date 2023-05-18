@@ -1,10 +1,11 @@
 ﻿// Ignore Spelling: Sbcharts
 
+using ECStrategy.Models.Base;
 using ECStrategy.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ECStrategy.Sbcharts
+namespace ECStrategy.Strategy.Sbcharts
 {
     public class SbchartsStrategy : BaseStrategy<Request, Response>
     {
@@ -36,12 +37,12 @@ namespace ECStrategy.Sbcharts
 
                     var result = default(IDictionary<DateTime, string>);
 
-                    switch (this._fieldName)
+                    switch (_fieldName)
                     {
                         case "UnemploymentBenefits":
                             var group = values
-                               .Where(v => v.Timestamp.TimestampsToDateTime() >= this._dateRange.StartDate &&
-                                   v.Timestamp.TimestampsToDateTime() <= this._dateRange.EndDate)
+                               .Where(v => v.Timestamp.TimestampsToDateTime() >= _dateRange.StartDate &&
+                                   v.Timestamp.TimestampsToDateTime() <= _dateRange.EndDate)
                                .GroupBy(v => v.Timestamp.TimestampsToDateTime().ToString("yyyy-MM")).ToList();
 
                             result = group.ToDictionary(g => g.First().Timestamp.TimestampsToDateTime(), v => v.First().Actual?.ToString("0.0000"));
@@ -50,8 +51,8 @@ namespace ECStrategy.Sbcharts
 
                         default:
                             result = values
-                               .Where(v => v.Timestamp.TimestampsToDateTime().AddMonths(-1) >= this._dateRange.StartDate &&
-                                   v.Timestamp.TimestampsToDateTime().AddMonths(-1) <= this._dateRange.EndDate)
+                               .Where(v => v.Timestamp.TimestampsToDateTime().AddMonths(-1) >= _dateRange.StartDate &&
+                                   v.Timestamp.TimestampsToDateTime().AddMonths(-1) <= _dateRange.EndDate)
                                .ToDictionary(v => v.Timestamp.TimestampsToDateTime().AddMonths(-1), v => v.Actual?.ToString("0.0000"));
 
                             break;

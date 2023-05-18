@@ -1,4 +1,6 @@
-﻿namespace ECStrategy.Fred
+﻿using ECStrategy.Models.Base;
+
+namespace ECStrategy.Strategy.Fred
 {
     public class Request : BaseRequest
     {

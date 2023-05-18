@@ -1,6 +1,7 @@
-﻿using HtmlAgilityPack;
+﻿using ECStrategy.Models.Base;
+using HtmlAgilityPack;
 
-namespace ECStrategy.SalaryGrowth
+namespace ECStrategy.Strategy.SalaryGrowth
 {
     public class SalaryGrowthStrategy : BaseStrategy<Request, Response>
     {
@@ -44,7 +45,7 @@ namespace ECStrategy.SalaryGrowth
                     }
 
                     return result
-                        .Where(r => r.Date >= this._dateRange.StartDate && r.Date <= this._dateRange.EndDate)
+                        .Where(r => r.Date >= _dateRange.StartDate && r.Date <= _dateRange.EndDate)
                         .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value);
                 }
             }

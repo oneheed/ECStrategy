@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using ECStrategy.Models.Base;
+using Newtonsoft.Json;
 
-namespace ECStrategy.Yahoo
+namespace ECStrategy.Strategy.Yahoo
 {
     public class Request : BaseRequest
     {

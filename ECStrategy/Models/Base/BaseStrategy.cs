@@ -1,6 +1,6 @@
 ﻿using ECStrategy.Interfaces;
 
-namespace ECStrategy
+namespace ECStrategy.Models.Base
 {
     public abstract class BaseStrategy<TRequest, TResponse> : IStrategy
     {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ECStrategy.Sbcharts
+namespace ECStrategy.Strategy.Sbcharts
 {
     public class Response
     {

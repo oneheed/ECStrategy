@@ -1,10 +1,11 @@
 ﻿// Ignore Spelling: Macromicro
 
+using ECStrategy.Models.Base;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ECStrategy.Macromicro
+namespace ECStrategy.Strategy.Macromicro
 {
     public class MacromicroStrategy : BaseStrategy<Request, Response>
     {
@@ -70,7 +71,7 @@ namespace ECStrategy.Macromicro
 
 
                     return result
-                        .Where(r => r.Date >= this._dateRange.StartDate && r.Date <= this._dateRange.EndDate)
+                        .Where(r => r.Date >= _dateRange.StartDate && r.Date <= _dateRange.EndDate)
                         .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value);
                 }
             }
