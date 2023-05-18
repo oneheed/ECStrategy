@@ -74,11 +74,11 @@ var fields = configuration.GetSection("Crawler:Fields").Get<Dictionary<string, C
 
 var csvResult = new Dictionary<(DateTime Start, DateTime End), JObject>();
 
-for (var i = dateRange.StartDate; i <= dateRange.EndDate;)
+for (var i = dateRange.EndDate; i >= dateRange.StartDate;)
 {
-    csvResult.Add((i, i.AddMonths(1)), new JObject());
+    csvResult.Add((i.AddMonths(-1), i), new JObject());
 
-    i = i.AddMonths(1);
+    i = i.AddMonths(-1);
 }
 
 foreach (var field in fields)
