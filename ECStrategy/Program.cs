@@ -1,7 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using ECStrategy;
 using ECStrategy.Interfaces;
 using ECStrategy.Models;
+using ECStrategy.Strategy.CBC;
+using ECStrategy.Strategy.FED;
 using ECStrategy.Strategy.Fred;
 using ECStrategy.Strategy.Investing;
 using ECStrategy.Strategy.Macromicro;
@@ -12,6 +13,7 @@ using ECStrategy.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -40,6 +42,8 @@ Dictionary<string, Type> dict = new()
     { nameof(SbchartsStrategy), typeof(SbchartsStrategy) },
     { nameof(SalaryGrowthStrategy), typeof(SalaryGrowthStrategy) },
     { nameof(InvestingStrategy), typeof(InvestingStrategy) },
+    { nameof(CBCStrategy), typeof(CBCStrategy) },
+    { nameof(FEDStrategy), typeof(FEDStrategy) },
 };
 
 serviceCollection.AddScoped<YahooStrategy>();
@@ -67,6 +71,16 @@ static void Configure(IServiceCollection services)
 
 var fields = configuration.GetSection("Crawler:Fields").Get<Dictionary<string, CrawlerFieldConfig>>();
 
+
+var csvResult = new Dictionary<(DateTime Start, DateTime End), JObject>();
+
+for (var i = dateRange.StartDate; i <= dateRange.EndDate;)
+{
+    csvResult.Add((i, i.AddMonths(1)), new JObject());
+
+    i = i.AddMonths(1);
+}
+
 foreach (var field in fields)
 {
 
@@ -78,7 +92,18 @@ foreach (var field in fields)
 
         var result = await strategy.SendRequest();
 
+        foreach (var item in result)
+        {
+            var data = csvResult.FirstOrDefault(c => DateTime.Parse(item.Key) >= c.Key.Start && DateTime.Parse(item.Key) < c.Key.End);
+
+            data.Value[field.Key] = item.Value;
+        }
+
         Console.WriteLine(field.Key);
         Console.WriteLine(JsonConvert.SerializeObject(result));
     }
 }
+
+Console.WriteLine("=================================================");
+Console.WriteLine(JsonConvert.SerializeObject(csvResult));
+Console.ReadLine();

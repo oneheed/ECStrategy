@@ -14,9 +14,6 @@ namespace ECStrategy.Strategy.Fred
 
         public override async Task HttpRequestMessageAsync()
         {
-            var test = _crawlerFieldConfig.Extra;
-
-
             _request = new Request
             {
                 Sid = _crawlerFieldConfig.Extra.TryGetValue(nameof(Request.Sid), out var sid) ? sid : string.Empty,

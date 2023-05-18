@@ -86,8 +86,8 @@ namespace ECStrategy.Strategy.Investing
                 }
 
                 return result
-                        .Where(r => r.Date >= _dateRange.StartDate && r.Date <= _dateRange.EndDate)
-                        .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value);
+                    .Where(r => r.Date >= _dateRange.StartDate && r.Date <= _dateRange.EndDate)
+                    .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value);
             }
             catch (Exception ex)
             {
