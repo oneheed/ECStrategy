@@ -9,7 +9,6 @@ namespace ECStrategy.Utilities
         public static string GetStrategyName(string key)
             => $"{key}Strategy";
 
-
         public static string RequestToQueryString<T>(this T request) where T : BaseRequest
         {
             var step1 = JsonConvert.SerializeObject(request);

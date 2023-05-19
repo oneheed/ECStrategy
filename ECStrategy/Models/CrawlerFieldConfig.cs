@@ -2,6 +2,10 @@
 {
     public class CrawlerFieldConfig
     {
+        public int Order { get; set; } = 0;
+
+        public string Name { get; set; } = string.Empty;
+
         public string Strategy { get; set; } = string.Empty;
 
         public string Route { get; set; } = string.Empty;

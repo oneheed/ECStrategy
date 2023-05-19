@@ -1,14 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ECStrategy.Interfaces;
 using ECStrategy.Models;
-using ECStrategy.Strategy.CBC;
-using ECStrategy.Strategy.FED;
-using ECStrategy.Strategy.Fred;
-using ECStrategy.Strategy.Investing;
-using ECStrategy.Strategy.Macromicro;
-using ECStrategy.Strategy.SalaryGrowth;
-using ECStrategy.Strategy.Sbcharts;
-using ECStrategy.Strategy.Yahoo;
 using ECStrategy.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +12,9 @@ var configuration = new ConfigurationBuilder()
     .Build();
 
 var serviceCollection = new ServiceCollection();
+serviceCollection.AddScoped<IConfiguration>(_ => configuration);
 
-
+// DateRange
 var dateRangeConfig = configuration.GetSection("DateRange").Get<string[]>();
 var startDate = DateTime.Parse(dateRangeConfig[0]);
 var endDate = DateTime.Parse(dateRangeConfig[1]);
@@ -32,59 +25,29 @@ var dateRange = new DateRange
     EndDate = endDate,
 };
 
-serviceCollection.AddScoped<IConfiguration>(_ => configuration);
+ServiceCollectionUtility.StrategyConfigure(serviceCollection);
+ServiceCollectionUtility.HttpClientConfigure(serviceCollection);
 
-Dictionary<string, Type> dict = new()
-{
-    { nameof(FredStrategy), typeof(FredStrategy) },
-    { nameof(YahooStrategy), typeof(YahooStrategy) },
-    { nameof(MacromicroStrategy), typeof(MacromicroStrategy) },
-    { nameof(SbchartsStrategy), typeof(SbchartsStrategy) },
-    { nameof(SalaryGrowthStrategy), typeof(SalaryGrowthStrategy) },
-    { nameof(InvestingStrategy), typeof(InvestingStrategy) },
-    { nameof(CBCStrategy), typeof(CBCStrategy) },
-    { nameof(FEDStrategy), typeof(FEDStrategy) },
-};
 
-serviceCollection.AddScoped<YahooStrategy>();
-
-foreach (var item in dict)
-{
-    serviceCollection.AddScoped(item.Value);
-}
-
-Configure(serviceCollection);
-
-static void Configure(IServiceCollection services)
-{
-    var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
-    var urls = configuration.GetSection("Crawler:URLs").Get<IDictionary<string, string>>();
-
-    foreach (var url in urls)
-    {
-        services.AddHttpClient(CommandUtility.GetStrategyName(url.Key), c =>
-        {
-            c.BaseAddress = new Uri(url.Value);
-        });
-    }
-}
-
-var fields = configuration.GetSection("Crawler:Fields").Get<Dictionary<string, CrawlerFieldConfig>>();
+var crawlerFields = configuration.GetSection("Crawler:Fields").Get<Dictionary<string, CrawlerFieldConfig>>();
 
 
 var csvResult = new Dictionary<(DateTime Start, DateTime End), JObject>();
 
-for (var i = dateRange.EndDate; i >= dateRange.StartDate;)
+for (var i = dateRange.EndDate.AddMonths(1); i >= dateRange.StartDate;)
 {
     csvResult.Add((i.AddMonths(-1), i), new JObject());
 
     i = i.AddMonths(-1);
 }
 
-foreach (var field in fields)
-{
+GoogleSheetUtility.SetTitle(crawlerFields);
+GoogleSheetUtility.SetDate(dateRange);
 
-    if (dict.TryGetValue(CommandUtility.GetStrategyName(field.Value.Strategy), out var type))
+foreach (var field in crawlerFields)
+{
+    var key = CommandUtility.GetStrategyName(field.Value.Strategy);
+    if (ServiceCollectionUtility.Strategies.TryGetValue(key, out var type))
     {
         var strategy = (IStrategy)serviceCollection.BuildServiceProvider().GetService(type);
         await strategy.Init(field.Key, dateRange, field.Value);
@@ -103,6 +66,8 @@ foreach (var field in fields)
         Console.WriteLine(JsonConvert.SerializeObject(result));
     }
 }
+
+GoogleSheetUtility.SetData(csvResult.Values.ToList(), crawlerFields);
 
 Console.WriteLine("=================================================");
 Console.WriteLine(JsonConvert.SerializeObject(csvResult));
