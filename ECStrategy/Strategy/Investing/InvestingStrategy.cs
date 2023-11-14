@@ -61,9 +61,6 @@ namespace ECStrategy.Strategy.Investing
 
                 var stream = driver.PageSource;
 
-                driver.Quit();
-                driver.Dispose();
-
                 var doc = new HtmlDocument();
                 doc.LoadHtml(stream);
 
@@ -85,16 +82,18 @@ namespace ECStrategy.Strategy.Investing
                     result.Add((Date: dateTime, Value: price));
                 }
 
-                return result
+                return await Task.FromResult(result
                     .Where(r => r.Date >= _dateRange.StartDate && r.Date <= _dateRange.EndDate)
-                    .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value);
+                    .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value));
             }
             catch (Exception ex)
             {
+                return new Dictionary<string, string>();
+            }
+            finally
+            {
                 driver.Quit();
                 driver.Dispose();
-
-                return new Dictionary<string, string>();
             }
         }
     }

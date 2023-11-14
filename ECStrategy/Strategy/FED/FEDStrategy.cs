@@ -39,9 +39,9 @@ namespace ECStrategy.Strategy.FED
                     return (Date: DateTime.Parse(g.Key), Value: string.Join("\r\n", g.Select(i => $"{i.Data.Title}:{i.Data.Desc}")));
                 }).ToList();
 
-                return result
+                return await Task.FromResult(result
                     .Where(r => r.Date >= _dateRange.StartDate && r.Date <= _dateRange.EndDate)
-                    .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value);
+                    .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value));
             }
             catch (Exception ex)
             {

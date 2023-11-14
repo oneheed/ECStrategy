@@ -13,7 +13,7 @@ namespace ECStrategy.Utilities
 {
     public static class ServiceCollectionUtility
     {
-        private static Dictionary<string, Type> _strategies = new()
+        private static readonly Dictionary<string, Type> _strategies = new()
         {
             { nameof(FredStrategy), typeof(FredStrategy) },
             { nameof(YahooStrategy), typeof(YahooStrategy) },
@@ -25,7 +25,7 @@ namespace ECStrategy.Utilities
             { nameof(FEDStrategy), typeof(FEDStrategy) },
         };
 
-        public static void HttpClientConfigure(IServiceCollection services)
+        public static void HttpClientConfigure(this IServiceCollection services)
         {
             var configuration = services.BuildServiceProvider().GetService<IConfiguration>()!;
             var urls = configuration.GetSection("Crawler:URLs").Get<IDictionary<string, string>>();
@@ -42,7 +42,7 @@ namespace ECStrategy.Utilities
         public static Dictionary<string, Type> Strategies
             => _strategies;
 
-        public static void StrategyConfigure(IServiceCollection services)
+        public static void StrategyConfigure(this IServiceCollection services)
         {
             foreach (var strategy in _strategies)
             {

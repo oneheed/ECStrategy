@@ -16,7 +16,7 @@ namespace ECStrategy.Models.Base
 
         protected CrawlerFieldConfig _crawlerFieldConfig;
 
-        public async Task Init(string fieldName, DateRange dateRange, CrawlerFieldConfig crawlerFieldConfig)
+        public void Init(string fieldName, DateRange dateRange, CrawlerFieldConfig crawlerFieldConfig)
         {
             _fieldName = fieldName;
             _dateRange = dateRange;

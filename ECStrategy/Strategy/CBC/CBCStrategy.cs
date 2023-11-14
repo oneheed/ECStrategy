@@ -41,9 +41,9 @@ namespace ECStrategy.Strategy.CBC
                     result.Add((Date: dateTime, Value: rediscountRate));
                 }
 
-                return result
+                return await Task.FromResult(result
                     .Where(r => r.Date >= _dateRange.StartDate && r.Date <= _dateRange.EndDate)
-                    .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value);
+                    .ToDictionary(x => x.Date.ToString("yyyy-MM-dd"), x => x.Value));
             }
             catch (Exception ex)
             {

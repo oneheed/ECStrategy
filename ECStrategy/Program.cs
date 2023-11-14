@@ -25,8 +25,8 @@ var dateRange = new DateRange
     EndDate = endDate,
 };
 
-ServiceCollectionUtility.StrategyConfigure(serviceCollection);
-ServiceCollectionUtility.HttpClientConfigure(serviceCollection);
+serviceCollection.StrategyConfigure();
+serviceCollection.HttpClientConfigure();
 
 
 var crawlerFields = configuration.GetSection("Crawler:Fields").Get<Dictionary<string, CrawlerFieldConfig>>();
@@ -44,13 +44,15 @@ for (var i = dateRange.EndDate.AddMonths(1); i >= dateRange.StartDate;)
 GoogleSheetUtility.SetTitle(crawlerFields);
 GoogleSheetUtility.SetDate(dateRange);
 
+var serviceProvider = serviceCollection.BuildServiceProvider();
+
 foreach (var field in crawlerFields)
 {
     var key = CommandUtility.GetStrategyName(field.Value.Strategy);
     if (ServiceCollectionUtility.Strategies.TryGetValue(key, out var type))
     {
-        var strategy = (IStrategy)serviceCollection.BuildServiceProvider().GetService(type);
-        await strategy.Init(field.Key, dateRange, field.Value);
+        var strategy = (IStrategy)serviceProvider.GetService(type);
+        strategy.Init(field.Key, dateRange, field.Value);
         await strategy.HttpRequestMessageAsync();
 
         var result = await strategy.SendRequest();
